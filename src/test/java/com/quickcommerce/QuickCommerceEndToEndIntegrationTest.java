@@ -98,7 +98,10 @@ class QuickCommerceEndToEndIntegrationTest {
         Order order = platform.placeOrder("USR-1", "STR-1", items, customer.getAddress().getLocation());
         assertNotNull(order);
         assertEquals(OrderStatus.ASSIGNED, order.getStatus());
-        assertEquals(230.0, order.getTotalAmount()); // 2*85 + 60 = 230
+        assertEquals(261.5, order.getTotalAmount()); // 2*85 + 60 = 230 items + 20 delivery + 11.5 GST
+        assertNotNull(order.getPayment());
+        assertEquals(com.quickcommerce.enums.PaymentStatus.COMPLETED, order.getPayment().getStatus());
+        assertFalse(order.isSlaBreached());
 
         // Auto-assigned to closest partner (partnerNear)
         assertEquals("DP-NEAR", order.getDeliveryTask().getAssignedPartner().getPartnerId());

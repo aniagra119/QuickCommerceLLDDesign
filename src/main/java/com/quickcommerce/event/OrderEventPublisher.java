@@ -4,32 +4,40 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-public class OrderEventPublisher {
+public class OrderEventPublisher implements IOrderEventPublisher {
     private final List<OrderEventListener> listeners = new CopyOnWriteArrayList<>();
 
+    @Override
     public void registerListener(OrderEventListener listener) {
-        this.listeners.add(Objects.requireNonNull(listener, "listener cannot be null"));
+        if (listener != null && !listeners.contains(listener)) {
+            listeners.add(listener);
+        }
     }
 
+    @Override
     public void removeListener(OrderEventListener listener) {
-        this.listeners.remove(listener);
+        listeners.remove(listener);
+    }
+
+    @Override
+    public void publish(OrderEvent event) {
+        Objects.requireNonNull(event, "event cannot be null");
+        for (OrderEventListener listener : listeners) {
+            if (listener.supportsEventType(event.getClass())) {
+                listener.onEvent(event);
+            }
+        }
     }
 
     public void publishOrderPlaced(OrderPlacedEvent event) {
-        for (OrderEventListener listener : listeners) {
-            listener.onOrderPlaced(event);
-        }
+        publish(event);
     }
 
     public void publishOrderDispatched(OrderDispatchedEvent event) {
-        for (OrderEventListener listener : listeners) {
-            listener.onOrderDispatched(event);
-        }
+        publish(event);
     }
 
     public void publishOrderDelivered(OrderDeliveredEvent event) {
-        for (OrderEventListener listener : listeners) {
-            listener.onOrderDelivered(event);
-        }
+        publish(event);
     }
 }

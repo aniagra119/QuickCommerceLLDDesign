@@ -7,4 +7,8 @@ public class OrderPlacedEvent extends OrderEvent {
     public OrderPlacedEvent(String eventId, Order order, Instant timestamp) {
         super(eventId, order, timestamp);
     }
+
+    public OrderPlacedEvent(Order order) {
+        super("EVT-" + java.util.UUID.randomUUID().toString().substring(0, 8), order, java.time.Instant.now());
+    }
 }
